@@ -1,0 +1,10 @@
+1. Runs xemacs in the background.
+2. Changes directory so you can move around folders of the computer.
+3. Takes the contents of ~/.bashrc file and outputting it into a file called tmpfile.txt. 
+4. This creates a symbolic link (a pointer that points to the file) called tmpfile.txt to ~/tmp-alias so that the 'tmpfile.txt' name can be used.
+5. This command lists all the folders in the current directory including the hidden ones. 
+6. The chmod command modifies file permissions and the 'a+rwx' part will allow 'tmpfile.txt' to have read, write, and execute ability from anybody. 
+7. Searches and displays lines that contain 'bash' in /etc/passwd.
+8. Displays a complete list of processes that are running right now except kernel processes and pipes that data via '|' into 'more' which displays it page by page.
+9. 'man' is used as an in-terminal manual to get information about a command (ex. man chown) and the number is used to specify a certain section of the manual. 
+10. gcc command is used to compile C or C++ code which ouputs an executable and this specific command will do that and then move the output of error into a file called error-msg.
