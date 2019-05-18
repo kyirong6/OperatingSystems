@@ -1,0 +1,21 @@
+2.
+
+a) The -E option haults the stages of compilation directly after the preprocessing stage. The outputted content is preprocessed code. The preprocessor is the
+the first step of the journey to an executable. For example, the preprocessor takes care of the #include (and all other # statements) statements and 
+outputs a .i file. 
+
+b) It creates a hello.o file. This is an object file which is a result of compiling the files but not linking. This file is used by the linker to create 
+the executable.
+
+c) You get the executable. 
+
+d) _main not found. linker command failed with exit code 1. This error essentially means that the linker was not able to find a main() function.
+
+e) No error message. The difference is because of the '-c' option used. This stops before linking therefore it does not need a main(). Without the '-c',
+it fails because during the linker because the main() was commented out.
+
+3.
+
+a) Segmentation fault 11. This error message means that the program tried to use/access something that it wasnt meant to. 
+
+b) 
