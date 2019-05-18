@@ -18,4 +18,46 @@ it fails because during the linker because the main() was commented out.
 
 a) Segmentation fault 11. This error message means that the program tried to use/access something that it wasnt meant to. 
 
-b) 
+b) __GI_____strtol_l_internal
+
+c) stdlib
+
+d) p argc: $1 = 1
+   p argv: $2 = (char **) 0x7fffffffdfb8
+   argv: this is a vector of arguments (strings) where each entry is one of the arguments put into the program.
+
+e) the 'info' command in gdb lists certain aspects of gdb. In this case, info local will display all local variables in the state of the program
+   and info args will display the arguments of the program.
+
+f) 0x0. It leads to an error because it is expecting an argument and as shown in gdb, the 2nd element of argv is empty.
+
+4.
+
+a) x: (int *) 0x0 , y: 0 , *x: Cannot access memory at address 0x0 , *y: Cannot access memory at address 0x0 , &x: (int **) 0x7fffffffdec8 , &y: (int *) 0x7fffffffdec4
+
+x: is an int pointer which holds a memory address. In this case, equating it to 0 means it is a null pointer.
+y: is a regular int variable which holds the value 0.
+*x: this dereferences the pointer. In this case, it is a null pointer, hence, the “cannot access…”
+*y: this dereferences a pointer and y is not a pointer so it cannot perform the operation.
+&x: this is the memory address of the location in which the pointer itself lives.
+&y: this is the memory address of the location in which the int y lives. 
+
+b) x: (int *) 0x7fffffffdec4 , y: 1 , *x: 1 , *y: Cannot access memory at 0x1
+
+x: this changed because it was assigned the memory address of y (which held an int value of 0). 
+y: this changed because x’s value changed to the memory address of y, then it was dereferenced and changed to 1 which also changed y to 1 because of the same memory location.
+*x: the dereferenced value of x changed twice. First, to 0, because it was set to y’s memory location. Second, it was changed to 1 because of ‘set *x = 1’.
+
+c) x: int( *) 0x7fff0000000a , *x: Cannot access memory at address 0x7fff0000000a 
+
+x: this changed because of ‘set *(x+1) = 10’. x holds the memory address of y, adding 1 to that you get the memory address of x. Then, you dereference the memory address of x and equate it to 10 which is the same as changing the value of x to 10. 
+*x: This is now a different memory address from y so it cannot access it. 
+
+d) x: (int *) 0x7fffffffdec4 , y: 0xffffdec4, *x: 0xffffdec4 , *y: Cannot access memory at address 0xffffffffffffdec4 
+
+x: x is now set back to y’s address
+y: y is set the value of its own address but cannot hold complete value using int.
+*x: dereferenced x also holds y’s address because of ‘y=x’.
+*y: y is not a pointer.
+
+e) It is used to remove/inhibit the warnings produced.
