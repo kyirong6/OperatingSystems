@@ -1,3 +1,5 @@
+1.
+
 1. Runs xemacs in the background.
 2. Changes directory so you can move around folders of the computer.
 3. Takes the contents of ~/.bashrc file and outputting it into a file called tmpfile.txt. 
