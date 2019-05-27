@@ -15,8 +15,13 @@
  */
 int mystrlen (const char *s) 
 {
-	/* Complete the body of the function */
-	return 0;
+  /* Complete the body of the function */
+  
+  int count = 0;
+  while (s[count] != '\0') {
+    count++;
+  }
+  return count;
 }
 
 /*
@@ -26,8 +31,24 @@ int mystrlen (const char *s)
  */
 char  *mystrcpy (char *dst, const char *src)
 {
-	/* Complete the body of the function */
-	return NULL;
+  /* Complete the body of the function */
+  if (dst == NULL) {
+    return NULL;
+  }
+
+  if (src == NULL) {
+    return NULL;
+  }
+
+  char *cpy = dst;
+  while (*src != '\0') {
+    *dst = *src;
+    dst++;
+    src++;
+  }
+  *dst = '\0';
+  
+  return cpy;
 }
 
 /*
@@ -39,8 +60,26 @@ char  *mystrcpy (char *dst, const char *src)
  */
 int mystrcmp(const char *s1, const char *s2)
 {
-	/* Complete the body of the function */
-	return 0;
+  /* Complete the body of the function */
+  while (*s1) {
+    if (*s1 != *s2) {
+      break;
+    }
+    s1++;
+    s2++;
+  }
+
+  int s1N = *(const unsigned char*)s1;
+  int s2N = *(const unsigned char*)s2;
+  
+  if (s1N == s2N) {
+    return 0;
+  } else if (s1N < s2N){
+    return -1;
+  } else {
+    return 1;
+  }
+  
 }
 
 /*
