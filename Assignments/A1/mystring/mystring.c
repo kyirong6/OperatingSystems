@@ -62,25 +62,19 @@ char  *mystrcpy (char *dst, const char *src)
 int mystrcmp(const char *s1, const char *s2)
 {
   /* Complete the body of the function */
-  while (*s1) {
-    if (*s1 != *s2) {
-      break;
+  while (*s1 == *s2) {
+    if (*s1 == '\0') {
+      return 0;
     }
     s1++;
     s2++;
   }
 
-  int s1N = *(const unsigned char*)s1;
-  int s2N = *(const unsigned char*)s2;
-  
-  if (s1N == s2N) {
-    return 0;
-  } else if (s1N < s2N){
+  if (((unsigned char) *s1 - (unsigned char) *s2) < 0) {
     return -1;
   } else {
     return 1;
   }
-  
 }
 
 /*
@@ -110,7 +104,9 @@ char *mystrdup(const char *s1)
     cpy++;
     s1++;
   }
-    
+
+  *cpy = '\0';
+  
   return ptr;
 }
 
