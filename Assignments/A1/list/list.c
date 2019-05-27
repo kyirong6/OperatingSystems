@@ -97,10 +97,23 @@ void List_deleteNode(Node **headRef, Node* node) {
 
 
 void List_sort(Node **headRef) {
+  Node* curr = *headRef;
+  if (curr->next == NULL) {
+    return;
+  }
   
-  
+  int len = List_countNodes(curr);
 
-
-
+  for (int i=0; i<len; i++) {
+    for (int j=0; j<len-i-1; j++){
+      if (curr->item > curr->next->item) {
+	int more = curr->item;
+	curr->item = curr->next->item;
+	curr->next->item = more;
+      }
+      curr = curr->next;
+    }
+    curr = *headRef;
+  }
 }
 

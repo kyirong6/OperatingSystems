@@ -12,22 +12,23 @@ int main(int argc, char** argv)
 {
 	printf("Starting tests...\n");
 	Node* head = NULL;
-	/*
+	
 	Node* head2 = NULL;
 
-	Node* var = List_createNode(5);
+	Node* var = List_createNode(7);
 	Node* var2 = List_createNode(6);
-	Node* var3 = List_createNode(7);
-	List_insertHead(&head, var);
-	List_insertTail(&head, var2);
-	List_insertTail(&head, var3);
-	printf("%i", head->item);
-	printf("%i", head->next->item);
-	printf("%i", head->next->next->item);
-	printf("%i", List_countNodes(head));
+	Node* var3 = List_createNode(5);
+	List_insertHead(&head2, var);
+	List_insertTail(&head2, var2);
+	List_insertTail(&head2, var3);
+	printf("%i", head2->item);
+	printf("%i", head2->next->item);
+	printf("%i", head2->next->next->item);
 	printf("%i", List_countNodes(head2));
-	*/
-	
+	List_sort(&head2);
+	printf("%i", head2->item);
+	printf("%i", head2->next->item);
+	printf("%i", head2->next->next->item);
        
 	
 	// Starting count:
@@ -56,7 +57,7 @@ int main(int argc, char** argv)
 	assert(current->item == -5);
 	assert(current->next == NULL);
 
-	/*
+	
 	// Sort and verify:
 	List_sort(&head);
 	current = head;
@@ -65,7 +66,7 @@ int main(int argc, char** argv)
 	current = current->next;
 	assert(current->item == 0);
 	assert(current->next == NULL);
-	*/
+	
 	
 	// Delete
 	assert(List_countNodes(head) == 2);
