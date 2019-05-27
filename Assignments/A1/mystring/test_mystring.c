@@ -38,7 +38,7 @@ int main()
 	assert(mystrcmp("","\0") == 0);
 
 	
-	/*
+	
 
 	char *dupStr = mystrdup(buffer);
 	assert (!strcmp(buffer, dupStr));
@@ -46,7 +46,7 @@ int main()
 
 	if (dupStr != NULL)
 		free (dupStr);
-	*/
+       
 	
 	printf ("\nPassed VERY simple tests, remember to develop more tests.\n");
 

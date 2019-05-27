@@ -1,5 +1,6 @@
 #include "mystring.h"
 #include <stdio.h>
+#include <stdlib.h>
 
 /*
  *   Implement the following functions: 
@@ -92,7 +93,24 @@ int mystrcmp(const char *s1, const char *s2)
  */
 char *mystrdup(const char *s1)
 {
+  
 	/* Complete the body of the function */
-	return NULL;
+  int len = mystrlen(s1);
+  char *cpy = (char *) malloc(len + 1);
+  char *ptr = cpy;
+
+  
+  if (cpy == NULL) {
+     return NULL;
+  }
+
+  while (*s1 != '\0') {
+    *cpy = *s1;
+
+    cpy++;
+    s1++;
+  }
+    
+  return ptr;
 }
 
