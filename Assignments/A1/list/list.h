@@ -1,3 +1,8 @@
+typedef struct nodeStruct {
+    int item;
+    struct nodeStruct *next;
+} Node;
+
 /*
  * Allocate memory for a node of type struct nodeStruct and initialize
  * it with the value item. Return a pointer to the new node.

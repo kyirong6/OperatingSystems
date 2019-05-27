@@ -1,11 +1,5 @@
-#inclde "list.h"
+#include "list.h"
 #include <stdlib.h>
-
-typedef struct nodeStruct {
-    int item;
-    struct nodeStruct *next;
-} Node;
-
 
 Node* List_createNode(int item) {
   Node* node;
@@ -16,15 +10,29 @@ Node* List_createNode(int item) {
   return node;
 }
 
-void List_insertHead(Node **headRef, Node node) {
+void List_insertHead(Node **headRef, Node* node) {
   node->next = (*headRef);
   (*headRef) = node;
+  return;
 }
 
-void List_insertTail(Node **headRef, Node node) {
+void List_insertTail(Node **headRef, Node* node) {
+  node->next = NULL;
+
+  if (*headRef == NULL) {
+    *headRef = node;
+    return;
+  }
   
+  Node* curr =  *headRef;
+  while (curr->next != NULL) {
+    curr = curr->next;
+  }
+  curr->next = node;
 
+  return;
 }
+
 
 
 
