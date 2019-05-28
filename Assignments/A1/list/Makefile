@@ -14,4 +14,4 @@ test: test_list
 	./test_list
 
 clean:
-	rm-f core *.o test_list
+	rm -f core *.o test_list

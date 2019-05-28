@@ -12,24 +12,18 @@ int main(int argc, char** argv)
 {
 	printf("Starting tests...\n");
 	Node* head = NULL;
-	
 	Node* head2 = NULL;
 
 	Node* var = List_createNode(7);
+	assert(var->next == NULL);
 	Node* var2 = List_createNode(6);
 	Node* var3 = List_createNode(5);
 	List_insertHead(&head2, var);
 	List_insertTail(&head2, var2);
 	List_insertTail(&head2, var3);
-	printf("%i", head2->item);
-	printf("%i", head2->next->item);
-	printf("%i", head2->next->next->item);
-	printf("%i", List_countNodes(head2));
+	assert(head2->item == 7);
 	List_sort(&head2);
-	printf("%i", head2->item);
-	printf("%i", head2->next->item);
-	printf("%i", head2->next->next->item);
-       
+	assert(head2->item == 5);
 	
 	// Starting count:
 	assert(List_countNodes(head) == 0);
