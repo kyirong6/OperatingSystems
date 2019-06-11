@@ -230,6 +230,21 @@ int main(int argc, char* argv[])
             continue;
         }
       }
+      if (atoi(&tokens[0][1]) != 0) {
+        int hist = atoi(&tokens[0][1]);
+        if (hist <= 0) {
+          write(STDOUT_FILENO, "History unknown\n", strlen("History unknown\n"));
+          continue;
+        }
+        if (hist <= count) {
+          previous = true;
+          strcpy(input_buffer, history[hist-1]);
+          read_command(input_buffer, input_buffer_history, tokens, &in_background, &previous);
+        } else {
+          write(STDOUT_FILENO, "History unknown\n", strlen("History unknown\n"));
+          continue;
+        }
+      }
     }
 
     // exit program
