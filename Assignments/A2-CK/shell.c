@@ -138,12 +138,20 @@ int tokenize_command(char *buff, char *tokens[])
  * in_background: pointer to a boolean variable. Set to true if user entered
  *       an & as their last token; otherwise set to false.
  */
-void read_command(char *buff, char *buff_history, char *tokens[], _Bool *in_background)
+void read_command(char *buff, char *buff_history, char *tokens[], _Bool *in_background, _Bool *prev_cmd)
 {
 	*in_background = false;
+  int length;
+
 
 	// Read input
-	int length = read(STDIN_FILENO, buff, COMMAND_LENGTH-1);
+  if (*prev_cmd == false) {
+	   length = read(STDIN_FILENO, buff, COMMAND_LENGTH-1);
+  }
+
+  if (*prev_cmd == true) {
+    length = strlen(buff);
+  }
 
 
 	if (length < 0) {
@@ -195,7 +203,8 @@ int main(int argc, char* argv[])
 		// signals, and read() is incompatible with printf().
 		write(STDOUT_FILENO, cwd, strlen(cwd));
 		_Bool in_background = false;
-		read_command(input_buffer, input_buffer_history , tokens, &in_background);
+    _Bool previous = false;
+		read_command(input_buffer, input_buffer_history , tokens, &in_background, &previous);
 
     // Cleanup any previously exited background child processes
     // (The zombies)
@@ -207,6 +216,20 @@ int main(int argc, char* argv[])
     // handle empty input
     if (tokens[0] == 0) {
       continue;
+    }
+
+    // handling !
+    if (*tokens[0] == '!' && (strlen(tokens[0]) != 1)) {
+      if (strcmp(tokens[0], "!!") == 0) {
+        if (count > 0) {
+          previous = true;
+          strcpy(input_buffer, history[count-1]);
+          read_command(input_buffer, input_buffer_history, tokens, &in_background, &previous);
+        } else {
+            write(STDOUT_FILENO, "No previous commands\n", strlen("No previous commands\n"));
+            continue;
+        }
+      }
     }
 
     // exit program
@@ -237,6 +260,7 @@ int main(int argc, char* argv[])
       continue;
     }
 
+    // print out the history
     if (strcmp(tokens[0], "history") == 0) {
       remember(input_buffer_history, in_background);
       recall();
