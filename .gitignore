@@ -1,6 +1,8 @@
 test_mystring
 test_list
 
+.DS_Store
+
 # Prerequisites
 *.d
 
