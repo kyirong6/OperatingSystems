@@ -21,7 +21,16 @@ int count=0;
 
 /* ---------- HISTORY FUNCTIONS ----------- */
 
+
+void remember(char *buff, _Bool in_background) {
+  strcpy(history[count], buff);
+  count++;
+}
+
+
+
 // insert into history array
+/*
 void remember(char *tokens[], _Bool in_background) {
   int i = 0;
   char input[COMMAND_LENGTH] = "";
@@ -45,6 +54,7 @@ void remember(char *tokens[], _Bool in_background) {
   strcpy(history[count], input);
   count++;
 }
+*/
 
 
 // print last 10 or fewer commands
@@ -128,12 +138,13 @@ int tokenize_command(char *buff, char *tokens[])
  * in_background: pointer to a boolean variable. Set to true if user entered
  *       an & as their last token; otherwise set to false.
  */
-void read_command(char *buff, char *tokens[], _Bool *in_background)
+void read_command(char *buff, char *buff_history, char *tokens[], _Bool *in_background)
 {
 	*in_background = false;
 
 	// Read input
 	int length = read(STDIN_FILENO, buff, COMMAND_LENGTH-1);
+
 
 	if (length < 0) {
 		perror("Unable to read command from keyboard. Terminating.\n");
@@ -145,6 +156,7 @@ void read_command(char *buff, char *tokens[], _Bool *in_background)
 	if (buff[strlen(buff) - 1] == '\n') {
 		buff[strlen(buff) - 1] = '\0';
 	}
+  strcpy(buff_history, buff);
 
 	// Tokenize (saving original command string)
 	int token_count = tokenize_command(buff, tokens);
@@ -167,6 +179,7 @@ int main(int argc, char* argv[])
 
   char cwd[PATH_MAX];
 	char input_buffer[COMMAND_LENGTH];
+  char input_buffer_history[COMMAND_LENGTH];
 	char *tokens[NUM_TOKENS];
 	while (true) {
 
@@ -182,12 +195,12 @@ int main(int argc, char* argv[])
 		// signals, and read() is incompatible with printf().
 		write(STDOUT_FILENO, cwd, strlen(cwd));
 		_Bool in_background = false;
-		read_command(input_buffer, tokens, &in_background);
+		read_command(input_buffer, input_buffer_history , tokens, &in_background);
 
     // Cleanup any previously exited background child processes
     // (The zombies)
     while (waitpid(-1, NULL, WNOHANG) > 0)
-	; // do nothing.
+      ; // do nothing.
 
     /* ---------INTERNAL COMMANDS START HERE---------- */
 
@@ -207,7 +220,7 @@ int main(int argc, char* argv[])
       getcwd(cwd, sizeof(cwd));
       write(STDOUT_FILENO, cwd, strlen(cwd));
       write(STDOUT_FILENO, "\n", strlen("\n"));
-      remember(tokens, in_background);
+      remember(input_buffer_history, in_background);
       continue;
     }
 
@@ -220,12 +233,12 @@ int main(int argc, char* argv[])
           write(STDOUT_FILENO, "No such file or directory\n", strlen("No such file or directory\n"));
         }
       }
-      remember(tokens, in_background);
+      remember(input_buffer_history, in_background);
       continue;
     }
 
     if (strcmp(tokens[0], "history") == 0) {
-      remember(tokens, in_background);
+      remember(input_buffer_history, in_background);
       recall();
       continue;
     }
@@ -255,7 +268,7 @@ int main(int argc, char* argv[])
        int status;
        pid_t pid;
        pid = fork();
-       remember(tokens, in_background);
+       remember(input_buffer_history, in_background);
 
        if (pid < 0) {
          write(STDOUT_FILENO, "Fork failed.\n", strlen("Fork failed.\n"));
