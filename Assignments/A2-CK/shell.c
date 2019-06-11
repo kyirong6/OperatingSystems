@@ -8,6 +8,7 @@
 #include <unistd.h>
 #include <limits.h>
 #include  <sys/types.h>
+#include <sys/wait.h>
 
 #define COMMAND_LENGTH 1024
 #define NUM_TOKENS (COMMAND_LENGTH / 2 + 1)
@@ -186,7 +187,7 @@ int main(int argc, char* argv[])
     // Cleanup any previously exited background child processes
     // (The zombies)
     while (waitpid(-1, NULL, WNOHANG) > 0)
-      ; // do nothing.
+	; // do nothing.
 
     /* ---------INTERNAL COMMANDS START HERE---------- */
 
