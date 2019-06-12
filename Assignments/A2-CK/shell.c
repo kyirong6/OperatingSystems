@@ -151,6 +151,10 @@ void read_command(char *buff, char *buff_history, char *tokens[], _Bool *in_back
 		return;
 	}
 
+  if (token_count == 1 && strcmp(tokens[0], "&") == 0) {
+    return;
+  }
+
 	// Extract if running in background:
 	if (token_count > 0 && strcmp(tokens[token_count - 1], "&") == 0) {
 		*in_background = true;
@@ -195,7 +199,7 @@ int main(int argc, char* argv[])
     input_buffer[0] = '\0';
     input_buffer_history[0] = '\0';
     // Cleanup any previously exited background child processes
-    // (The zombies)
+// (The zombies)
     while (waitpid(-1, NULL, WNOHANG) > 0)
       ; // do nothing.
 		read_command(input_buffer, input_buffer_history , tokens, &in_background, &previous);
