@@ -196,10 +196,7 @@ int main(int argc, char* argv[])
     input_buffer_history[0] = '\0';
 		read_command(input_buffer, input_buffer_history , tokens, &in_background, &previous);
 
-    // Cleanup any previously exited background child processes
-    // (The zombies)
-    while (waitpid(-1, NULL, WNOHANG) > 0)
-      ; // do nothing.
+
 
     /* ---------INTERNAL COMMANDS START HERE---------- */
 
@@ -286,6 +283,7 @@ int main(int argc, char* argv[])
     /* ------------INTERNAL COMMANDS END HERE------------- */
 
 		// DEBUG: Dump out arguments:
+    /*
 
 		for (int i = 0; tokens[i] != NULL; i++) {
 			write(STDOUT_FILENO, "   Token: ", strlen("   Token: "));
@@ -295,6 +293,7 @@ int main(int argc, char* argv[])
 		if (in_background) {
 			write(STDOUT_FILENO, "Run in background.\n", strlen("Run in background.\n"));
 		}
+    */
 
 
 		/**
@@ -305,28 +304,30 @@ int main(int argc, char* argv[])
 		 *    child to finish. Otherwise, parent loops back to
 		 *    read_command() again immediately.
 		 */
-     else {
-       // try and create a child process
-       int status;
-       pid_t pid;
-       pid = fork();
-       remember(input_buffer_history);
 
-       if (pid < 0) {
-         write(STDOUT_FILENO, "Fork failed.\n", strlen("Fork failed.\n"));
-         exit(1);
-       } else if (pid == 0) { // child process
-          if (execvp(tokens[0], tokens) == -1) {
-             write(STDOUT_FILENO, tokens[0], strlen(tokens[0]));
-             write(STDOUT_FILENO, ": Unknown command.\n", strlen(": Unknown command.\n"));
-             exit(1);
-          }
-      } else {
-          if (!in_background) {
-            waitpid(pid, &status, WUNTRACED);
-          }
-      }
-     }
+     // try and create a child process
+     write(STDOUT_FILENO, "hello\n", strlen("hello\n"));
+     int status;
+     pid_t pid;
+     pid = fork();
+     remember(input_buffer_history);
+
+     if (pid < 0) {
+       write(STDOUT_FILENO, "Fork failed.\n", strlen("Fork failed.\n"));
+       exit(1);
+     } else if (pid == 0) { // child process
+        if (execvp(tokens[0], tokens) == -1) {
+           write(STDOUT_FILENO, tokens[0], strlen(tokens[0]));
+           write(STDOUT_FILENO, ": Unknown command.\n", strlen(": Unknown command.\n"));
+           exit(1);
+        }
+    } else {
+        if (!in_background) {
+          write(STDOUT_FILENO, "hello2\n", strlen("hello2\n"));
+          waitpid(pid, &status, WUNTRACED);
+          continue;
+        }
+    }
 	}
 	return 0;
 }
