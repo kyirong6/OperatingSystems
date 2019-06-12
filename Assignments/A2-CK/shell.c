@@ -7,54 +7,27 @@
 #include <string.h>
 #include <unistd.h>
 #include <limits.h>
-#include  <sys/types.h>
+#include <sys/types.h>
 #include <sys/wait.h>
+#include <signal.h>
+#include <errno.h>
 
 #define COMMAND_LENGTH 1024
 #define NUM_TOKENS (COMMAND_LENGTH / 2 + 1)
-#define HISTORY_DEPTH 100
+#define HISTORY_DEPTH 10
 
 // used to store commands
 char history[HISTORY_DEPTH][COMMAND_LENGTH];
 int count=0;
 
 
+
 /* ---------- HISTORY FUNCTIONS ----------- */
 
-
-void remember(char *buff, _Bool in_background) {
-  strcpy(history[count], buff);
+void remember(char *buff) {
+  strcpy(history[count%HISTORY_DEPTH], buff);
   count++;
 }
-
-
-
-// insert into history array
-/*
-void remember(char *tokens[], _Bool in_background) {
-  int i = 0;
-  char input[COMMAND_LENGTH] = "";
-
-  while (tokens[i] != 0) {
-    if (i == 0) {
-      strcat(input, tokens[i]);
-      i++;
-      continue;
-    } else {
-      strcat(input, " ");
-      strcat(input, tokens[i]);
-      i++;
-    }
-  }
-
-  if (in_background) {
-    strcat(input, " &");
-  }
-
-  strcpy(history[count], input);
-  count++;
-}
-*/
 
 
 // print last 10 or fewer commands
@@ -69,19 +42,25 @@ void recall() {
       write(STDOUT_FILENO, "\n", strlen("\n"));
     }
   } else {
-    int i = count - 10;
+    int i = count - HISTORY_DEPTH;
     while (i < count) {
       char index[10];
       sprintf(index, "%d", i + 1);
       write(STDOUT_FILENO, index, strlen(index));
       write(STDOUT_FILENO, "\t", strlen("\t"));
-      write(STDOUT_FILENO, history[i], strlen(history[i]));
+      write(STDOUT_FILENO, history[i%HISTORY_DEPTH], strlen(history[i%HISTORY_DEPTH]));
       write(STDOUT_FILENO, "\n", strlen("\n"));
       i++;
     }
   }
 }
 /* ----------- HISTORY ENDS HERE -------------*/
+
+/* Signal handler function */
+void handle_SIGINT() {
+      write(STDOUT_FILENO, "\n", strlen("\n"));
+      recall();
+}
 
 
 /**
@@ -154,10 +133,10 @@ void read_command(char *buff, char *buff_history, char *tokens[], _Bool *in_back
   }
 
 
-	if (length < 0) {
-		perror("Unable to read command from keyboard. Terminating.\n");
-		exit(-1);
-	}
+  if ( (length < 0) && (errno !=EINTR) ){
+        perror("Unable to read command. Terminating.\n");
+        exit(-1);  /* terminate with error */
+    }
 
 	// Null terminate and strip \n.
 	buff[length] = '\0';
@@ -179,6 +158,7 @@ void read_command(char *buff, char *buff_history, char *tokens[], _Bool *in_back
 	}
 }
 
+
 /**
  * Main and Execute Commands
  */
@@ -189,6 +169,14 @@ int main(int argc, char* argv[])
 	char input_buffer[COMMAND_LENGTH];
   char input_buffer_history[COMMAND_LENGTH];
 	char *tokens[NUM_TOKENS];
+
+  /* set up the signlan handler */
+  struct sigaction handler;
+  handler.sa_handler = handle_SIGINT;
+  handler.sa_flags = 0;
+  sigemptyset(&handler.sa_mask);
+  sigaction(SIGINT, &handler, NULL);
+
 	while (true) {
 
     // get the current working directory right away and handle error
@@ -204,6 +192,8 @@ int main(int argc, char* argv[])
 		write(STDOUT_FILENO, cwd, strlen(cwd));
 		_Bool in_background = false;
     _Bool previous = false;
+    input_buffer[0] = '\0';
+    input_buffer_history[0] = '\0';
 		read_command(input_buffer, input_buffer_history , tokens, &in_background, &previous);
 
     // Cleanup any previously exited background child processes
@@ -220,28 +210,39 @@ int main(int argc, char* argv[])
 
     // handling !
     if (*tokens[0] == '!' && (strlen(tokens[0]) != 1)) {
+
+      if (atoi(&tokens[0][1]) == 0 && strcmp(tokens[0], "!!") != 0) {
+        write(STDOUT_FILENO, "SHELL: Unknown history command.\n", strlen("SHELL: Unknown history command.\n"));
+        continue;
+      }
+
       if (strcmp(tokens[0], "!!") == 0) {
         if (count > 0) {
           previous = true;
-          strcpy(input_buffer, history[count-1]);
+          strcpy(input_buffer, history[(count-1)%HISTORY_DEPTH]);
+          write(STDOUT_FILENO, input_buffer, strlen(input_buffer));
+          write(STDOUT_FILENO, "\n", strlen("\n"));
           read_command(input_buffer, input_buffer_history, tokens, &in_background, &previous);
         } else {
-            write(STDOUT_FILENO, "No previous commands\n", strlen("No previous commands\n"));
+            write(STDOUT_FILENO, "SHELL: Unknown history command.\n", strlen("SHELL: Unknown history command.\n"));
             continue;
         }
       }
+
       if (atoi(&tokens[0][1]) != 0) {
         int hist = atoi(&tokens[0][1]);
         if (hist <= 0) {
-          write(STDOUT_FILENO, "History unknown\n", strlen("History unknown\n"));
+          write(STDOUT_FILENO, "SHELL: Unknown history command.\n", strlen("SHELL: Unknown history command.\n"));
           continue;
         }
-        if (hist <= count) {
+        if (hist <= count && hist >= (count - 9)) {
           previous = true;
-          strcpy(input_buffer, history[hist-1]);
+          strcpy(input_buffer, history[(hist-1)%HISTORY_DEPTH]);
+          write(STDOUT_FILENO, input_buffer, strlen(input_buffer));
+          write(STDOUT_FILENO, "\n", strlen("\n"));
           read_command(input_buffer, input_buffer_history, tokens, &in_background, &previous);
         } else {
-          write(STDOUT_FILENO, "History unknown\n", strlen("History unknown\n"));
+          write(STDOUT_FILENO, "SHELL: Unknown history command.\n", strlen("SHELL: Unknown history command.\n"));
           continue;
         }
       }
@@ -258,7 +259,7 @@ int main(int argc, char* argv[])
       getcwd(cwd, sizeof(cwd));
       write(STDOUT_FILENO, cwd, strlen(cwd));
       write(STDOUT_FILENO, "\n", strlen("\n"));
-      remember(input_buffer_history, in_background);
+      remember(input_buffer_history);
       continue;
     }
 
@@ -271,13 +272,13 @@ int main(int argc, char* argv[])
           write(STDOUT_FILENO, "No such file or directory\n", strlen("No such file or directory\n"));
         }
       }
-      remember(input_buffer_history, in_background);
+      remember(input_buffer_history);
       continue;
     }
 
     // print out the history
     if (strcmp(tokens[0], "history") == 0) {
-      remember(input_buffer_history, in_background);
+      remember(input_buffer_history);
       recall();
       continue;
     }
@@ -285,6 +286,7 @@ int main(int argc, char* argv[])
     /* ------------INTERNAL COMMANDS END HERE------------- */
 
 		// DEBUG: Dump out arguments:
+
 		for (int i = 0; tokens[i] != NULL; i++) {
 			write(STDOUT_FILENO, "   Token: ", strlen("   Token: "));
 			write(STDOUT_FILENO, tokens[i], strlen(tokens[i]));
@@ -293,6 +295,7 @@ int main(int argc, char* argv[])
 		if (in_background) {
 			write(STDOUT_FILENO, "Run in background.\n", strlen("Run in background.\n"));
 		}
+
 
 		/**
 		 * Steps For Basic Shell:
@@ -307,7 +310,7 @@ int main(int argc, char* argv[])
        int status;
        pid_t pid;
        pid = fork();
-       remember(input_buffer_history, in_background);
+       remember(input_buffer_history);
 
        if (pid < 0) {
          write(STDOUT_FILENO, "Fork failed.\n", strlen("Fork failed.\n"));
