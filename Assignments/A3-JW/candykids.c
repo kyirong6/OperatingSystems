@@ -75,12 +75,12 @@ int main(int argc, char *argv[])
         factory_num = atoi(argv[1]);
         kid_num = atoi(argv[2]);
         seconds = atoi(argv[3]);
-    }
-    if (factory_num <= 0 || kid_num <= 0 || seconds <= 0)
-    {
+        if (factory_num <= 0 || kid_num <= 0 || seconds <= 0)
+        {
 
-        printf("Error: All arguments must be positive.\n");
-        exit(-1);
+            printf("Error: All arguments must be positive.\n");
+            exit(-1);
+        }
     }
     else
     {
