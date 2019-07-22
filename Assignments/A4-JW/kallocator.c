@@ -194,32 +194,6 @@ void kfree(void* _ptr) {
 
 
 int compact_allocation(void** _before, void** _after) {
-    int compacted_size = 0;
-    // int j=0;
-    // int k=0;
-    // for(int i=0;i<MAXSIZE*2;i++)ss
-    // {
-    //     if(j<kallocator.sizeA)
-    //     {
-    //         if(k<kallocator.sizeF)
-    //         {
-    //             if((intptr_t)kallocator.mallo[j].start<(intptr_t)kallocator.mfree[k].start)
-    //                 _before[i]=kallocator.mallo[j++].start;
-    //             else
-    //                 _before[i]=kallocator.mfree[k++].start;
-    //         }
-    //         else
-    //         {
-    //             _before[i]=kallocator.mallo[j++].start;
-    //         }
-    //     }
-    //     else if(k<kallocator.sizeF)
-    //         _before[i]=kallocator.mfree[k++].start;
-    //     else
-    //         break;
-    // }
-    // compacted_size+=kallocator.sizeA;
-    // compacted_size+=kallocator.sizeF;
 
     for(int i=0;i<kallocator.sizeA;i++)
     {
@@ -239,36 +213,6 @@ int compact_allocation(void** _before, void** _after) {
     {
         _after[i]=kallocator.mallo[i].start;
     }
-
-    // j=0;
-    // k=0;
-    // for(int i=0;i<MAXSIZE*2;i++)
-    // {
-    //     if(j<kallocator.sizeA)
-    //     {
-    //         if(k<kallocator.sizeF)
-    //         {
-    //             if((intptr_t)kallocator.mallo[j].start<(intptr_t)kallocator.mfree[k].start)
-    //                 _after[i]=kallocator.mallo[j++].start;
-    //             else
-    //                 _after[i]=kallocator.mfree[k++].start;
-    //         }
-    //         else
-    //         {
-    //             _after[i]=kallocator.mallo[j++].start;
-    //         }
-    //     }
-    //     else if(k<kallocator.sizeF)
-    //         _after[i]=kallocator.mfree[k++].start;
-    //     else
-    //         break;
-    // }
-
-    // compacted_size+=kallocator.sizeA;
-    // compacted_size+=kallocator.sizeF;
-
-    // compact allocated memory
-    // update _before, _after and compacted_size
 
     return kallocator.sizeA;
 }
